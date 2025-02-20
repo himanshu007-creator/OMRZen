@@ -110,7 +110,7 @@ export default function Home() {
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2 }}
               >
-                <Label htmlFor="negativeMarks">Negative Marks</Label>
+                <Label htmlFor="negativeMarks">Marks for Incorrect Answer</Label>
                 <Input
                   id="negativeMarks"
                   type="number"
