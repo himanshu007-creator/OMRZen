@@ -45,6 +45,12 @@ export default function TestPage() {
     }
   }, [router]);
 
+
+  const handleSubmit = () => {
+    localStorage.setItem("testCompleted", "true");
+    router.push("/check");
+  };
+
   useEffect(() => {
     if (timeLeft <= 0) return;
 
@@ -62,7 +68,7 @@ export default function TestPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [timeLeft]);
+  }, [timeLeft, handleSubmit]);
 
   const handleAnswer = (answer: Answer) => {
     const newAnswers = { ...answers, [currentQuestion]: answer };
@@ -72,11 +78,6 @@ export default function TestPage() {
     if (currentQuestion < (testConfig?.questionCount || 0)) {
       setCurrentQuestion(currentQuestion + 1);
     }
-  };
-
-  const handleSubmit = () => {
-    localStorage.setItem("testCompleted", "true");
-    router.push("/check");
   };
 
   const handleReset = () => {

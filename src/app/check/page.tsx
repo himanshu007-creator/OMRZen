@@ -124,16 +124,12 @@ export default function CheckPage() {
     if (!testConfig) return;
   
     let totalScore = 0;
-    let correctCount = 0;
-    let attemptedCount = 0;
   
     Object.entries(userAnswers).forEach(([question, answer]) => {
       const correctAnswer = correctAnswers[parseInt(question)];
-      attemptedCount++;
   
       if (correctAnswer === answer) {
         totalScore += testConfig.positiveMarks;
-        correctCount++;
       } else if (correctAnswer) { // Only deduct marks if there's a correct answer marked
         totalScore -= testConfig.negativeMarks;
       }
