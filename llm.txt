@@ -1,0 +1,27 @@
+# OMRZen - Modern OMR Sheet Testing Platform
+
+> A minimalist, user-friendly online OMR sheet testing platform
+
+OMRZen is a modern web application that provides an intuitive interface for conducting and evaluating OMR-based tests. It features real-time test-taking, automatic evaluation, and detailed result analysis.
+
+## Pages
+
+- [Home Page](/): The landing page where users can configure test parameters including question count, marking scheme, and time duration.
+- [Test Page](/test): Interactive test-taking interface with real-time progress tracking and a dynamic answer grid.
+- [Check Page](/check): Comprehensive result analysis page showing detailed performance metrics and score breakdown.
+
+## Features
+
+- Real-time test progress tracking
+- Customizable test configuration
+- Automatic scoring system
+- Detailed performance analytics
+- Responsive design for all devices
+- Dark mode support
+
+## Technical Stack
+
+- [Next.js](https://nextjs.org): React framework for production
+- [Tailwind CSS](https://tailwindcss.com): Utility-first CSS framework
+- [Framer Motion](https://www.framer.com/motion/): Animation library
+- [TypeScript](https://www.typescriptlang.org): Type-safe JavaScript

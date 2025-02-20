@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://OMRZen.vercel.app/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 10
