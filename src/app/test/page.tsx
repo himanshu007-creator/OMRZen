@@ -64,7 +64,6 @@ export default function TestPage() {
   }, [router]);
 
   const handleSubmit = useCallback(() => {
-    localStorage.setItem("answers", JSON.stringify(answers))
     localStorage.setItem("testCompleted", "true");
     router.push("/check");
   }, [router]);
