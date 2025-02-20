@@ -97,7 +97,10 @@ export default function TestPage() {
   };
 
   const handleReset = () => {
-    localStorage.clear();
+    localStorage.removeItem("testConfig");
+    localStorage.removeItem("correctAnswers");
+    localStorage.removeItem("timeLeft");
+    localStorage.removeItem("answers");
     router.push("/");
   };
 
