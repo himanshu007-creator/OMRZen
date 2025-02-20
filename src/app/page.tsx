@@ -41,12 +41,12 @@ export default function Home() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="space-y-4 text-center"
+            className="space-y-1 sm:space-y-4 text-center"
           >
-            <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent animate-pulse [animation-duration:3s]">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent animate-pulse [animation-duration:3s]">
               OMRZen
             </h1>
-            <p className="text-muted-foreground text-md max-w-md mx-auto">
+            <p className="text-sm sm:text-md text-muted-foreground max-w-md mx-auto">
               A minimalist OMR sheet checker. Take tests, check answers instantly, and save reports for future reference.
             </p>
           </motion.div>
