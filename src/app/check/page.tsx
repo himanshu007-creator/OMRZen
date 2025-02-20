@@ -378,16 +378,16 @@ export default function CheckPage() {
           animate={{ y: 0, opacity: 1 }}
           className="space-y-6"
         >
-          <div className="p-6 rounded-lg border bg-card text-card-foreground shadow-sm space-y-4 flex justify-between items-start">
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Instructions</h3>
-              <ul className="space-y-2 text-muted-foreground">
+          <div className="p-4 sm:p-6 rounded-lg border bg-card text-card-foreground shadow-sm space-y-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+            <div className="space-y-3 sm:space-y-4">
+              <h3 className="text-base sm:text-lg font-semibold">Instructions</h3>
+              <ul className="space-y-2 text-sm sm:text-base text-muted-foreground">
                 <li>1) Check your answers carefully, and revisit your mistakes</li>
                 <li>2) Final report will be available after calculating results</li>
               </ul>
             </div>
             <Button
-              className="text-xl py-6 px-8"
+              className="text-base sm:text-xl py-4 sm:py-6 px-6 sm:px-8 w-full sm:w-auto"
               size="lg"
               onClick={calculateScore}
               disabled={Object.keys(correctAnswers).length !== Object.keys(userAnswers).length}
@@ -449,6 +449,19 @@ export default function CheckPage() {
               );
             })}
           </div>
+
+          {/* Add floating button for mobile */}
+          {Object.keys(correctAnswers).length === Object.keys(userAnswers).length && (
+            <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
+              <Button
+                className="w-full text-base py-4 px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
+                size="lg"
+                onClick={calculateScore}
+              >
+                Calculate Results
+              </Button>
+            </div>
+          )}
         </motion.div>
       </main>
     </div>

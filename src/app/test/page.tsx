@@ -181,7 +181,7 @@ export default function TestPage() {
               onClick={handleSubmit}
               disabled={Object.keys(answers).length === 0}
             >
-              Submit and Check
+              Submit and Check. 
             </Button>
           </motion.div>
         </main>
