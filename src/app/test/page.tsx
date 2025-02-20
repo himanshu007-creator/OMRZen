@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Clock1, Clock2, Clock3, Clock4, Clock5, Clock6, Clock7, Clock8, Clock9, Clock10, Clock11, Clock12, MoveHorizontal, ChevronLeft, Eraser } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { clearLocalStorage } from "@/lib/utils";
 
 type TestConfig = {
   questionCount: number;
@@ -63,6 +64,7 @@ export default function TestPage() {
   }, [router]);
 
   const handleSubmit = useCallback(() => {
+    localStorage.setItem("answers", JSON.stringify(answers))
     localStorage.setItem("testCompleted", "true");
     router.push("/check");
   }, [router]);
@@ -86,22 +88,42 @@ export default function TestPage() {
     return () => clearInterval(timer);
   }, [timeLeft, handleSubmit]);
 
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const buttonParentRef = useRef<HTMLDivElement>(null);
+
+  const handleReset = () => {
+    if (Object.keys(answers).length === 0) {
+      setToast({ message: "Test not attempted! Please answer at least one question.", type: "error" });
+      setTimeout(() => {
+        clearLocalStorage();
+        router.push("/");
+      }, 2000);
+      return;
+    }
+    clearLocalStorage();
+    router.push("/");
+  };
+
   const handleAnswer = (answer: Answer) => {
     const newAnswers = { ...answers, [currentQuestion]: answer };
     setAnswers(newAnswers);
     localStorage.setItem("answers", JSON.stringify(newAnswers));
 
     if (currentQuestion < (testConfig?.questionCount || 0)) {
-      setCurrentQuestion(currentQuestion + 1);
-    }
-  };
+      // Remove hover and focus states from all buttons
+      const buttons = buttonParentRef.current?.querySelectorAll('button');
+      buttons?.forEach(button => {
+        button.blur();
+        button.classList.remove('hover');
+      });
 
-  const handleReset = () => {
-    localStorage.removeItem("testConfig");
-    localStorage.removeItem("correctAnswers");
-    localStorage.removeItem("timeLeft");
-    localStorage.removeItem("answers");
-    router.push("/");
+      // Synthetic click on parent
+      buttonParentRef.current?.click();
+
+      setTimeout(() => {
+        setCurrentQuestion(currentQuestion + 1);
+      }, 300);
+    }
   };
 
   if (!testConfig) return null;
@@ -171,6 +193,11 @@ export default function TestPage() {
       {sidebarPosition === 'left' && sidebarContent}
       <div className="flex-1 h-screen overflow-y-auto">
         <Header onReset={handleReset} />
+        {toast && (
+          <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white z-50`}>
+            {toast.message}
+          </div>
+        )}
         <main className="container max-w-lg mx-auto pt-16 sm:pt-24 px-4 pb-8">
           <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -226,19 +253,31 @@ export default function TestPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
-              {["A", "B", "C", "D"].map((option) => (
+            <div 
+              ref={buttonParentRef} 
+              id="buttonParent" 
+              className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4"
+            >
+              {["A", "B", "C", "D"].map((option, index) => (
                 <motion.div
                   key={option}
-                  whileTap={{ scale: 0.95 }}
-                  animate={{
-                    scale: answers[currentQuestion] === option ? [1, 1.05, 1] : 1,
-                    transition: { duration: 0.2 }
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0,
+                    scale: answers[currentQuestion] === option ? [1, 1.05, 1] : 1
                   }}
+                  transition={{ 
+                    duration: 0.3,
+                    delay: index * 0.1,
+                    scale: { duration: 0.2 }
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <Button
                     variant={answers[currentQuestion] === option ? "default" : "outline"}
-                    className="h-12 sm:h-16 md:h-24 text-xl sm:text-2xl md:text-3xl w-full"
+                    className="h-12 sm:h-16 md:h-24 text-xl sm:text-2xl md:text-3xl w-full transition-colors duration-200"
                     onClick={() => handleAnswer(option as Answer)}
                   >
                     {option}

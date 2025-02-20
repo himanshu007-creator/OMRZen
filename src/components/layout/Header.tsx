@@ -26,6 +26,7 @@ export function Header({ onReset }: { onReset: () => void }) {
     localStorage.removeItem("timeLeft");
     localStorage.removeItem("testCompleted");
     localStorage.removeItem("correctAnswers");
+    localStorage.removeItem("testCompleted")
     onReset();
   };
 

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
+import { clearLocalStorage } from "@/lib/utils";
 
 export default function Home() {
   const router = useRouter();
@@ -18,10 +19,7 @@ export default function Home() {
   });
 
   const handleReset = () => {
-    localStorage.removeItem("testConfig");
-    localStorage.removeItem("correctAnswers");
-    localStorage.removeItem("timeLeft");
-    localStorage.removeItem("answers");
+    clearLocalStorage();
     window.location.reload();
   };
 
