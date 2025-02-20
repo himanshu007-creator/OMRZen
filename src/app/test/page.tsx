@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
@@ -46,10 +46,10 @@ export default function TestPage() {
   }, [router]);
 
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     localStorage.setItem("testCompleted", "true");
     router.push("/check");
-  };
+  }, [router]);
 
   useEffect(() => {
     if (timeLeft <= 0) return;

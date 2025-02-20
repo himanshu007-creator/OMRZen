@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import {
   Tooltip,
   TooltipContent,
@@ -47,6 +48,32 @@ export function Header({ onReset }: { onReset: () => void }) {
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <motion.a
+                  href="https://www.producthunt.com/posts/omrzen"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:scale-105 transition-transform flex items-center justify-center"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Image 
+                    src={`https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=897849&theme=${theme}&t=1740023496918`}
+                    alt="OMRZen - Modern omr sheet testing platform | Product Hunt"
+                    width={150}
+                    height={36}
+                    className="h-9 w-auto"
+                    priority
+                  />
+                </motion.a>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" className="font-medium">
+                Featured on Product Hunt
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
