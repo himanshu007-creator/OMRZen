@@ -30,12 +30,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Header onReset={handleReset} />
-      <main className="container max-w-lg mx-auto pt-24 px-4">
+      <main className="container max-w-lg mx-auto pt-24 px-6 sm:px-4">
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="space-y-8"
+          className="space-y-4"
         >
           <motion.div 
             initial={{ y: 20, opacity: 0 }}
@@ -46,7 +46,7 @@ export default function Home() {
             <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent animate-pulse [animation-duration:3s]">
               OMRZen
             </h1>
-            <p className="text-muted-foreground text-lg max-w-md mx-auto">
+            <p className="text-muted-foreground text-md max-w-md mx-auto">
               A minimalist OMR sheet checker. Take tests, check answers instantly, and save reports for future reference.
             </p>
           </motion.div>
@@ -55,14 +55,14 @@ export default function Home() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
-            className="space-y-6 bg-card p-6 rounded-xl border shadow-sm"
+            className="space-y-6 bg-card p-6 rounded-2xl border dark:shadow-primary/5 shadow-xl dark:shadow-primary/10 transition-shadow"
           >
             <div className="space-y-2">
               <h2 className="text-xl font-semibold">Test Configuration</h2>
               <p className="text-muted-foreground text-sm">Set up your test parameters</p>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-2">
               <motion.div 
                 className="space-y-2"
                 whileHover={{ scale: 1.01 }}
@@ -131,7 +131,7 @@ export default function Home() {
                 whileHover={{ scale: 1.01 }}
                 transition={{ duration: 0.2 }}
               >
-                <Label htmlFor="timeInMinutes">Time (in minutes)</Label>
+                <Label htmlFor="timeInMinutes">Test duration (in minutes)</Label>
                 <Input
                   id="timeInMinutes"
                   type="number"
@@ -153,7 +153,7 @@ export default function Home() {
               transition={{ duration: 0.2 }}
             >
               <Button
-                className="w-full mt-6 bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-semibold"
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground text-base font-medium sm:text-lg sm:font-semibold"
                 size="lg"
                 onClick={handleStartTest}
               >

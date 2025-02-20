@@ -191,7 +191,7 @@ export default function CheckPage() {
                   <div className="text-right">
                     <div className="text-xs opacity-75">Score</div>
                     <div className="text-lg font-semibold">
-                      +{(Object.entries(userAnswers).filter(
+                      + {(Object.entries(userAnswers).filter(
                         ([q, a]) => correctAnswers[parseInt(q)] === a
                       ).length * testConfig.positiveMarks).toFixed(1)}
                     </div>
@@ -215,7 +215,7 @@ export default function CheckPage() {
                   <div className="text-right">
                     <div className="text-xs opacity-75">Penalty</div>
                     <div className="text-lg font-semibold">
-                      -{(Object.entries(userAnswers).filter(
+                      - {(Object.entries(userAnswers).filter(
                         ([q, a]) => correctAnswers[parseInt(q)] && correctAnswers[parseInt(q)] !== a
                       ).length * testConfig.negativeMarks).toFixed(1)}
                     </div>
@@ -244,7 +244,7 @@ export default function CheckPage() {
               <div className="h-px bg-border my-3" />
 
               <div className="grid gap-1.5 text-lg">
-                <div className="flex justify-between">
+                <div className="flex justify-between text-xl font-bold">
                   <span>Total Marks</span>
                   <span>{score}</span>
                 </div>
@@ -261,7 +261,7 @@ export default function CheckPage() {
                       onChange={(e) => setTestName(e.target.value.slice(0, 40))}
                       onBlur={() => setIsEditingName(false)}
                       autoFocus
-                      className="text-2xl font-bold bg-transparent text-center border-b border-primary outline-none transition-colors max-w-[300px]"
+                      className="text-xl font-semibold bg-transparent text-center border-b border-primary outline-none transition-colors max-w-[300px]"
                       placeholder="Enter test name"
                     />
                   ) : (

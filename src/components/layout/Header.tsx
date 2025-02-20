@@ -36,7 +36,7 @@ export function Header({ onReset }: { onReset: () => void }) {
       transition={{ duration: 0.4, ease: "easeOut" }}
       className="fixed top-0 left-0 right-0 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50"
     >
-      <div className="container flex h-16 items-center justify-between px-4 sm:px-8 md:px-12">
+      <div className="container flex h-16 items-center justify-between px-6 sm:px-12">
         <h1 
           className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent animate-pulse [animation-duration:3s]"
         >
