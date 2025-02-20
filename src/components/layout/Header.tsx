@@ -43,7 +43,7 @@ export function Header({ onReset }: { onReset: () => void }) {
           OMRZen
         </h1>
         <motion.div 
-          className="flex gap-3"
+          className="flex gap-1 sm:gap-3"
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
@@ -64,7 +64,7 @@ export function Header({ onReset }: { onReset: () => void }) {
                     alt="OMRZen - Modern omr sheet testing platform | Product Hunt"
                     width={150}
                     height={36}
-                    className="h-9 w-auto"
+                    className="h-7 w-auto sm:h-9 sm:w-auto mx-3"
                     priority
                   />
                 </motion.a>
