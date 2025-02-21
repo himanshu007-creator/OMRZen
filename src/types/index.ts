@@ -1,5 +1,5 @@
 export interface TestConfig {
-  numberOfQuestions: number;
+  questionCount: number;
   positiveMarks: number;
   negativeMarks: number;
   timeInMinutes: number;

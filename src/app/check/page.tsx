@@ -43,12 +43,15 @@ export default function CheckPage() {
       attempted: Object.keys(userAnswers).length,
       correctAnswers: Object.entries(userAnswers).filter(([q, a]) => correctAnswers[parseInt(q)] === a).length,
       incorrectAnswers: Object.entries(userAnswers).filter(([q, a]) => correctAnswers[parseInt(q)] && correctAnswers[parseInt(q)] !== a).length,
+      marksPerCorrectAnswer: testConfig?.positiveMarks,
+      marksPerIncorrectAnswer: testConfig?.negativeMarks,
       score,
       answers: Object.entries(userAnswers).map(([q, a]) => ({
         question: parseInt(q),
         userAnswer: a,
         correctAnswer: correctAnswers[parseInt(q)],
-        isCorrect: a === correctAnswers[parseInt(q)]
+        isCorrect: a === correctAnswers[parseInt(q)],
+        marks: testConfig ? (a === correctAnswers[parseInt(q)] ? testConfig.positiveMarks : (correctAnswers[parseInt(q)] ? -testConfig.negativeMarks : 0)) : 0
       }))
     };
 
@@ -57,16 +60,19 @@ export default function CheckPage() {
         ['Test Name', testName],
         ['Total Questions', testConfig?.questionCount.toString()],
         ['Attempted', Object.keys(userAnswers).length.toString()],
+        ['Marks per Correct Answer', testConfig?.positiveMarks.toString()],
+        ['Marks per Incorrect Answer', testConfig?.negativeMarks.toString()],
         ['Correct Answers', Object.entries(userAnswers).filter(([q, a]) => correctAnswers[parseInt(q)] === a).length.toString()],
         ['Incorrect Answers', Object.entries(userAnswers).filter(([q, a]) => correctAnswers[parseInt(q)] && correctAnswers[parseInt(q)] !== a).length.toString()],
         ['Final Score', score.toString()],
         [],
-        ['Question', 'User Answer', 'Correct Answer', 'Status'],
+        ['Question', 'User Answer', 'Correct Answer', 'Status', 'Marks'],
         ...Object.entries(userAnswers).map(([q, a]) => [
           q,
           a,
           correctAnswers[parseInt(q)],
-          a === correctAnswers[parseInt(q)] ? 'Correct' : 'Incorrect'
+          a === correctAnswers[parseInt(q)] ? 'Correct' : 'Incorrect',
+          a === correctAnswers[parseInt(q)] ? `+${testConfig?.positiveMarks}` : (correctAnswers[parseInt(q)] ? `-${testConfig?.negativeMarks}` : '0')
         ])
       ].map(row => row.join(',')).join('\n');
 
