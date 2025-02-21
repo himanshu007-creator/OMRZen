@@ -96,7 +96,8 @@ export default function TestPage() {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleSubmit(true);
+          const areSomeQuestionsAttempted = Object.keys(answers).length > 0;
+          handleSubmit(!areSomeQuestionsAttempted);
           return 0;
         }
         return prev - 1;
