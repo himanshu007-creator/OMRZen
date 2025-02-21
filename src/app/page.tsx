@@ -24,7 +24,7 @@ export default function Home() {
     defaultValues: {
       questionCount: "10",
       positiveMarks: "4",
-      negativeMarks: "1",
+      negativeMarks: "0",
       timeInMinutes: "30",
     },
   });
