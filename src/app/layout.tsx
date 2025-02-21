@@ -52,7 +52,7 @@ export default function RootLayout({
           <SpeedInsights />
         </ThemeProvider>
         <Script 
-          id="ws-seo-script"
+          id="wsAiSeoMb"
           src="https://wsstgpreprdwritesonic01.blob.core.windows.net/site-audit/fixer-script/index.js"
           strategy="afterInteractive"
         />
