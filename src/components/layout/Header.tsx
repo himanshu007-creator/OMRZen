@@ -10,6 +10,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { clearLocalStorage } from "@/lib/utils";
 
 export function Header({ onReset }: { onReset: () => void }) {
   const [mounted, setMounted] = useState(false);
@@ -21,12 +22,7 @@ export function Header({ onReset }: { onReset: () => void }) {
 
   const handleReset = () => {
     // Clear all test-related data from localStorage
-    localStorage.removeItem("testConfig");
-    localStorage.removeItem("answers");
-    localStorage.removeItem("timeLeft");
-    localStorage.removeItem("testCompleted");
-    localStorage.removeItem("correctAnswers");
-    localStorage.removeItem("testCompleted")
+    clearLocalStorage();
     onReset();
   };
 
@@ -39,7 +35,7 @@ export function Header({ onReset }: { onReset: () => void }) {
     >
       <div className="container flex h-16 items-center justify-between px-6 sm:px-12">
         <h1 
-          className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent animate-pulse [animation-duration:3s]"
+          className="text-lg sm:text-xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent animate-pulse [animation-duration:3s] select-none"
         >
           OMRZen
         </h1>

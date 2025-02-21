@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
-
+import { Eraser, X } from "lucide-react";
+import { Toast } from "@/components/ui/toast";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { QuestionGrid } from "@/components/ui/question-grid";
+import { clearLocalStorage } from "@/lib/utils";
 type TestConfig = {
   questionCount: number;
   positiveMarks: number;
@@ -29,6 +33,8 @@ export default function CheckPage() {
   const [showResults, setShowResults] = useState(false);
   const [score, setScore] = useState(0);
   const [toast, setToast] = useState<Toast | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<number | null>(null);
+  const [sidebarPosition, setSidebarPosition] = useState<'left' | 'right'>('right');
 
   const generateReport = (type: 'csv' | 'json') => {
     const reportData = {
@@ -122,25 +128,25 @@ export default function CheckPage() {
 
   const calculateScore = () => {
     if (!testConfig) return;
-  
+
     let totalScore = 0;
-  
+
     Object.entries(userAnswers).forEach(([question, answer]) => {
       const correctAnswer = correctAnswers[parseInt(question)];
-  
+
       if (correctAnswer === answer) {
         totalScore += testConfig.positiveMarks;
       } else if (correctAnswer) { // Only deduct marks if there's a correct answer marked
         totalScore -= testConfig.negativeMarks;
       }
     });
-  
-    setScore(totalScore);
+
+    setScore(Number(totalScore.toFixed(3)));
     setShowResults(true);
   };
 
   const handleReset = () => {
-    localStorage.clear();
+    clearLocalStorage();
     router.push("/");
   };
 
@@ -158,7 +164,7 @@ export default function CheckPage() {
             className="space-y-4 w-full"
           >
             <div className="space-y-3 text-center">
-              <motion.h1 
+              <motion.h1
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 className="text-2xl font-bold"
@@ -167,14 +173,14 @@ export default function CheckPage() {
               </motion.h1>
             </div>
 
-            <motion.div 
+            <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4 }}
               className="space-y-4 p-6 rounded-xl border bg-card text-card-foreground shadow-lg"
             >
               <div className="grid gap-3">
-                <motion.div 
+                <motion.div
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
@@ -198,7 +204,7 @@ export default function CheckPage() {
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   initial={{ x: 20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.6 }}
@@ -222,7 +228,7 @@ export default function CheckPage() {
                   </div>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   initial={{ x: -20, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ delay: 0.7 }}
@@ -355,115 +361,174 @@ export default function CheckPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header onReset={handleReset} />
-      <AnimatePresence>
-        {toast && (
+    <div className="min-h-screen bg-background flex overflow-hidden relative">
+       {sidebarPosition === 'left' && (
+      <QuestionGrid
+        totalQuestions={testConfig.questionCount}
+        currentQuestion={currentQuestion}
+        answers={userAnswers}
+        onQuestionClick={(num) => {
+          const element = document.getElementById(`question-${num}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setCurrentQuestion(num);
+          }
+        }}
+        sidebarPosition={sidebarPosition}
+        onToggleSidebar={() => setSidebarPosition(prev => prev === 'right' ? 'left' : 'right')}
+        showAttemptedOnly={true}
+        className="fixed"
+      />)}
+      <div className="flex-1 h-screen overflow-y-auto [&::-webkit-scrollbar]:hidden">
+        <Header onReset={handleReset} />
+        <AnimatePresence>
+          {toast && (
+            <Toast
+              message={toast.message}
+              type={toast.type}
+              onClose={() => setToast(null)}
+            />
+          )}
+        </AnimatePresence>
+        <main className="container max-w-4xl mx-auto pt-24 px-4 pb-8 relative">
           <motion.div
-            initial={{ y: -100, opacity: 0 }}
+            initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
-            className={`fixed sm:top-4 top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white flex items-center gap-2`}
+            className="space-y-6"
           >
-            <span>{toast.message}</span>
-            <button onClick={() => setToast(null)} className="text-white hover:text-white/80">
-              <X size={16} />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      <main className="container max-w-4xl mx-auto pt-24 px-4 pb-8">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="space-y-6"
-        >
-          <div className="p-4 sm:p-6 rounded-lg border bg-card text-card-foreground shadow-sm space-y-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div className="space-y-3 sm:space-y-4">
-              <h3 className="text-base sm:text-lg font-semibold">Instructions</h3>
-              <ul className="space-y-2 text-sm sm:text-base text-muted-foreground">
-                <li>1) Check your answers carefully, and revisit your mistakes</li>
-                <li>2) Final report will be available after calculating results</li>
-              </ul>
-            </div>
-            <Button
-              className="text-base sm:text-xl py-4 sm:py-6 px-6 sm:px-8 w-full sm:w-auto"
-              size="lg"
-              onClick={calculateScore}
-              disabled={Object.keys(correctAnswers).length !== Object.keys(userAnswers).length}
-            >
-              Calculate Results
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.keys(userAnswers).map((questionNum) => {
-              const qNum = parseInt(questionNum);
-              const userAnswer = userAnswers[qNum];
-              const correctAnswer = correctAnswers[qNum];
-              const isAnswered = correctAnswer !== undefined;
-              const isCorrect = isAnswered && userAnswer === correctAnswer;
-
-              return (
-                <motion.div
-                  key={questionNum}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`p-4 border rounded-lg space-y-4 ${isAnswered ? (isCorrect ? 'bg-green-50/50 dark:bg-green-900/10' : 'bg-red-50/50 dark:bg-red-900/10') : ''}`}
-                >
-                  <div className="flex justify-between items-center">
-                    <span className="font-semibold">Question {questionNum}</span>
-                    {isAnswered && (
-                      <span className={`text-sm font-medium ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                        {isCorrect ? 'Correct' : 'Incorrect'}
-                      </span>
-                    )}
-                  </div>
-                  <div className="grid grid-cols-4 xs:grid-cols-2 gap-2">
-                    {["A", "B", "C", "D"].map((option) => {
-                      const isUserAnswer = userAnswer === option;
-                      const isCorrectAnswer = correctAnswer === option;
-                      
-                      return (
-                        <Button
-                          key={option}
-                          variant={isAnswered ? "ghost" : "outline"}
-                          className={`h-12 text-lg relative ${isAnswered ? (
-                            isCorrectAnswer ? 'bg-green-100 hover:bg-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300' :
-                            isUserAnswer ? 'bg-red-100 hover:bg-red-200 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-700 dark:text-red-300 line-through' :
-                            'hover:bg-gray-100 dark:hover:bg-gray-800'
-                          ) : ''}`}
-                          onClick={() => !isAnswered && handleAnswer(qNum, option as Answer)}
-                          disabled={isAnswered}
-                        >
-                          {option}
-                          {isAnswered && isUserAnswer && !isCorrect && (
-                            <X className="h-4 w-4 text-red-500" />
-                          )}
-                        </Button>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-
-          {/* Add floating button for mobile */}
-          {Object.keys(correctAnswers).length === Object.keys(userAnswers).length && (
-            <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
+            <div className="p-4 sm:p-6 rounded-lg border bg-card text-card-foreground shadow-sm space-y-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div className="space-y-3 sm:space-y-4">
+                <h3 className="text-base sm:text-lg font-semibold">Checking instructions</h3>
+                <ul className="space-y-2 text-sm sm:text-base text-muted-foreground">
+                  <li>1) Check your answers carefully, and revisit your mistakes</li>
+                  <li>2) Final report will be available after calculating results</li>
+                </ul>
+              </div>
               <Button
-                className="w-full text-base py-4 px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
+                className="text-base sm:text-xl py-4 sm:py-6 px-6 sm:px-8 w-full sm:w-auto"
                 size="lg"
                 onClick={calculateScore}
+                disabled={Object.keys(correctAnswers).length !== Object.keys(userAnswers).length}
               >
                 Calculate Results
               </Button>
             </div>
-          )}
-        </motion.div>
-      </main>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 flex-row flex-wrap">
+              {Object.keys(userAnswers).sort((a, b) => parseInt(a) - parseInt(b)).map((questionNum) => {
+                const qNum = parseInt(questionNum);
+                const userAnswer = userAnswers[qNum];
+                const correctAnswer = correctAnswers[qNum];
+                const isAnswered = correctAnswer !== undefined;
+                const isCorrect = isAnswered && userAnswer === correctAnswer;
+
+                return (
+                  <motion.div
+                    key={questionNum}
+                    id={`question-${questionNum}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className={`p-4 border rounded-lg space-y-4 ${isAnswered ? (isCorrect ? 'bg-green-50/50 dark:bg-green-900/10' : 'bg-red-50/50 dark:bg-red-900/10') : ''}`}
+                  >
+                    <div className="flex justify-between items-center">
+                      <span className="font-semibold">Question {questionNum}</span>
+                      <div className="flex items-center gap-2">
+                        {isAnswered && (
+                          <span className={`text-sm font-medium ${isCorrect ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                            {isCorrect ? 'Correct' : 'Incorrect'}
+                          </span>
+                        )}
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+                                onClick={() => {
+                                  const newAnswers = { ...correctAnswers };
+                                  delete newAnswers[qNum];
+                                  setCorrectAnswers(newAnswers);
+                                  localStorage.setItem("correctAnswers", JSON.stringify(newAnswers));
+                                  showToast(`Question ${questionNum}: Answer cleared`, 'success');
+                                }}
+                                disabled={!isAnswered}
+                              >
+                                <Eraser className="h-4 w-4 text-gray-500" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="top">
+                              Clear marked answer
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-4 xs:grid-cols-2 gap-2">
+                      {["A", "B", "C", "D"].map((option) => {
+                        const isUserAnswer = userAnswer === option;
+                        const isCorrectAnswer = correctAnswer === option;
+
+                        return (
+                          <Button
+                            key={option}
+                            variant={isAnswered ? "ghost" : "outline"}
+                            className={`h-12 text-lg relative ${isAnswered ? (
+                              isCorrectAnswer ? 'bg-green-100 hover:bg-green-200 dark:bg-green-900/20 dark:hover:bg-green-900/30 text-green-700 dark:text-green-300' :
+                                isUserAnswer ? 'bg-red-100 hover:bg-red-200 dark:bg-red-900/20 dark:hover:bg-red-900/30 text-red-700 dark:text-red-300 line-through' :
+                                  'hover:bg-gray-100 dark:hover:bg-gray-800'
+                            ) : ''}`}
+                            onClick={() => !isAnswered && handleAnswer(qNum, option as Answer)}
+                            disabled={isAnswered}
+                          >
+                            {option}
+                            {isAnswered && isUserAnswer && !isCorrect && (
+                              <div className="absolute top-0 right-0 h-20 w-20 flex items-center justify-center">
+                                <X className="h-20 w-20 text-red-600 relative -right-3 -top-4 opacity-20" />
+                              </div>
+                            )}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Add floating button for mobile */}
+            {Object.keys(correctAnswers).length === Object.keys(userAnswers).length && (
+              <div className="md:hidden fixed bottom-4 left-4 right-4 z-50">
+                <Button
+                  className="w-full text-base py-4 px-6 bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg"
+                  size="lg"
+                  onClick={calculateScore}
+                >
+                  Calculate Results
+                </Button>
+              </div>
+            )}
+          </motion.div>
+        </main>
+      </div>
+      {sidebarPosition === 'right' && (
+      <QuestionGrid
+        totalQuestions={testConfig.questionCount}
+        currentQuestion={currentQuestion}
+        answers={userAnswers}
+        onQuestionClick={(num) => {
+          const element = document.getElementById(`question-${num}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setCurrentQuestion(num);
+          }
+        }}
+        sidebarPosition={sidebarPosition}
+        onToggleSidebar={() => setSidebarPosition(prev => prev === 'right' ? 'left' : 'right')}
+        showAttemptedOnly={true}
+        className="fixed"
+      />)}
     </div>
   );
 }

@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { Clock1, Clock2, Clock3, Clock4, Clock5, Clock6, Clock7, Clock8, Clock9, Clock10, Clock11, Clock12, MoveHorizontal, ChevronLeft, Eraser } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Clock1, Clock2, Clock3, Clock4, Clock5, Clock6, Clock7, Clock8, Clock9, Clock10, Clock11, Clock12, ChevronLeft, Eraser } from "lucide-react";
 import { clearLocalStorage } from "@/lib/utils";
+import { Toast } from "@/components/ui/toast";
+import { QuestionGrid } from "@/components/ui/question-grid";
 
 type TestConfig = {
   questionCount: number;
@@ -39,14 +40,24 @@ export default function TestPage() {
     }, 3000);
 
     return () => clearInterval(instructionInterval);
-  }, []);
+  },
+  // eslint-disable-next-line react-hooks/exhaustive-deps 
+  []);
 
   useEffect(() => {
     const savedConfig = localStorage.getItem("testConfig");
+    const isTestCompleted = localStorage.getItem("testCompleted");
+
     if (!savedConfig) {
       router.push("/");
       return;
     }
+
+    if (isTestCompleted) {
+      router.push("/check");
+      return;
+    }
+
     const config = JSON.parse(savedConfig) as TestConfig;
     setTestConfig(config);
 
@@ -63,21 +74,29 @@ export default function TestPage() {
     }
   }, [router]);
 
-  const handleSubmit = useCallback(() => {
-    localStorage.setItem("testCompleted", "true");
-    router.push("/check");
+  const handleSubmit = useCallback((forceSubmit?:boolean) => {
+    if(forceSubmit !== true){
+      localStorage.setItem("testCompleted", "true");
+      localStorage.removeItem("timeLeft")
+    }
+    setTimeout(() => {
+      router.push("/check");
+    }, 0);
   }, [router]);
 
   useEffect(() => {
-    if (timeLeft <= 0) return;
+    if (timeLeft <= 0) {
+      localStorage.removeItem("timeLeft");
+    }
 
-    localStorage.setItem("timeLeft", timeLeft.toString());
-
+    if(timeLeft > 1){
+      localStorage.setItem("timeLeft", timeLeft.toString());
+    }
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          handleSubmit();
+          handleSubmit(true);
           return 0;
         }
         return prev - 1;
@@ -144,58 +163,26 @@ export default function TestPage() {
     setSidebarPosition(prev => prev === 'right' ? 'left' : 'right');
   };
 
-  const sidebarContent = (
-    <div className="w-16 md:w-[320px] border-x border-gray-100 h-screen overflow-hidden bg-secondary flex flex-col">
-      <div className="p-2 md:p-4 md:pb-1 pb-1 sticky top-14 z-10 bg-secondary border-b">
-        <TooltipProvider>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleSidebarPosition}
-                className="mb-4 w-full flex items-center justify-center hover:bg-muted"
-              >
-                <MoveHorizontal className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side={sidebarPosition === 'right' ? 'left' : 'right'}>
-              Move to {sidebarPosition === 'right' ? 'left' : 'right'} side
-            </TooltipContent>
-          </Tooltip>
-        </TooltipProvider>
-      </div>
-      <div className="flex-1 overflow-y-auto p-2 md:p-4">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 py-4 pt-16">
-          {Array.from({ length: testConfig.questionCount }, (_, i) => i + 1).map((num) => (
-            <motion.button
-              key={num}
-              onClick={() => setCurrentQuestion(num)}
-              className={`h-12 w-full md:h-6 md:w-6 text-xs flex border border-primary items-center justify-center rounded mx-auto ${answers[num] ? 'bg-blue-500 text-white' : 'border border-gray-100 hover:bg-muted'} ${currentQuestion === num ? 'ring-1 ring-primary' : ''}`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                scale: answers[num] ? [1, 1.1, 1] : 1,
-                transition: { duration: 0.2 }
-              }}
-            >
-              {num}
-            </motion.button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-background flex overflow-hidden">
-      {sidebarPosition === 'left' && sidebarContent}
-      <div className="flex-1 h-screen overflow-y-auto">
+      {sidebarPosition === 'left' && (
+        <QuestionGrid
+          totalQuestions={testConfig.questionCount}
+          currentQuestion={currentQuestion}
+          answers={answers}
+          onQuestionClick={setCurrentQuestion}
+          sidebarPosition={sidebarPosition}
+          onToggleSidebar={toggleSidebarPosition}
+        />
+      )}
+      <div className="flex-1 h-screen overflow-y-auto [&::-webkit-scrollbar]:hidden">
         <Header onReset={handleReset} />
         {toast && (
-          <div className={`fixed top-4 right-4 p-4 rounded-lg shadow-lg ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white z-50`}>
-            {toast.message}
-          </div>
+          <Toast
+            message={toast.message}
+            type={toast.type}
+            onClose={() => setToast(null)}
+          />
         )}
         <main className="container max-w-lg mx-auto pt-16 sm:pt-24 px-4 pb-8">
           <motion.div
@@ -204,7 +191,7 @@ export default function TestPage() {
             className="space-y-6"
           >
             <div className="p-4 sm:p-6 mt-4 rounded-lg border bg-card text-card-foreground shadow-sm">
-              <h3 className="text-base sm:text-lg font-semibold mb-4">Instructions</h3>
+              <h3 className="text-base sm:text-lg font-semibold mb-4">Test instructions</h3>
               <div className="sm:hidden">
                 <motion.div
                   key={currentInstruction}
@@ -285,15 +272,15 @@ export default function TestPage() {
               ))}
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-3">
+            <div className="flex flex-row justify-between items-center gap-2">
               <Button
                 variant="outline"
                 onClick={() => setCurrentQuestion((prev) => Math.max(1, prev - 1))}
                 disabled={currentQuestion === 1}
-                className="w-full h-8 sm:h-10 text-sm sm:text-lg px-3 sm:px-6"
+                className="h-8 sm:h-10 aspect-square sm:aspect-auto sm:px-6"
               >
-                <ChevronLeft className="h-4 w-4 mr-4" />
-                Previous
+                <ChevronLeft className="h-4 w-4 sm:mr-4" />
+                <span className="hidden sm:inline">Previous</span>
               </Button>
               <Button
                 variant="outline"
@@ -304,34 +291,43 @@ export default function TestPage() {
                   localStorage.setItem("answers", JSON.stringify(newAnswers));
                 }}
                 disabled={!answers[currentQuestion]}
-                className="w-full h-8 sm:h-10 text-sm sm:text-lg px-3 sm:px-6 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/10"
+                className="h-8 sm:h-10 aspect-square sm:aspect-auto sm:px-6 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/10"
               >
-                <Eraser className="h-4 w-4 mr-4" />
-                Clear selection
+                <Eraser className="h-4 w-4 sm:mr-4" />
+                <span className="hidden sm:inline">Clear selection</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setCurrentQuestion((prev) => Math.min(testConfig.questionCount, prev + 1))}
                 disabled={currentQuestion === testConfig.questionCount}
-                className="w-full h-8 sm:h-10 text-sm sm:text-lg px-3 sm:px-6"
+                className="h-8 sm:h-10 aspect-square sm:aspect-auto sm:px-6"
               >
-                Next
-                <ChevronLeft className="h-4 w-4 transform rotate-180 ml-4" />
+                <ChevronLeft className="h-4 w-4 transform rotate-180 sm:ml-4" />
+                <span className="hidden sm:inline">Next</span>
               </Button>
             </div>
 
             <Button
               className="w-full h-12 sm:h-14 mt-4 sm:mt-6 text-base sm:text-xl font-medium"
               size="lg"
-              onClick={handleSubmit}
+              onClick={()=>handleSubmit()}
               disabled={Object.keys(answers).length === 0}
             >
-              Submit and Check
+              Finish and check answers
             </Button>
           </motion.div>
         </main>
       </div>
-      {sidebarPosition === 'right' && sidebarContent}
+      {sidebarPosition === 'right' && (
+        <QuestionGrid
+          totalQuestions={testConfig.questionCount}
+          currentQuestion={currentQuestion}
+          answers={answers}
+          onQuestionClick={setCurrentQuestion}
+          sidebarPosition={sidebarPosition}
+          onToggleSidebar={toggleSidebarPosition}
+        />
+      )}
     </div>
   );
 }
