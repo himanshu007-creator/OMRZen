@@ -53,14 +53,14 @@ export default function RootLayout({
         </ThemeProvider>
         <Script 
           id="wsAiSeoMb"
-          src="https://wsstgpreprdwritesonic01.blob.core.windows.net/site-audit/fixer-script/index.js"
+          src="https://seo-fixer.writesonic.com/site-audit/fixer-script/index.js"
           strategy="afterInteractive"
         />
         <Script id="ws-seo-config" strategy="afterInteractive">
           {`
             wsSEOfixer.configure({
-              hostURL: 'https://wsstgpreprdwritesonic01.blob.core.windows.net',
-              siteID: '67b7f439d8ef8705890a6de6'
+              hostURL: 'https://seo-fixer.writesonic.com',
+              siteID: '67bc3e78bdefe294a13b3140'
             });
           `}
         </Script>
