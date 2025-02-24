@@ -56,7 +56,7 @@ export default function RootLayout({
           src="https://seo-fixer.writesonic.com/site-audit/fixer-script/index.js"
           strategy="afterInteractive"
         />
-        <Script id="ws-seo-config" strategy="afterInteractive">
+        <Script id="wsAiSeoInitScript" strategy="afterInteractive">
           {`
             wsSEOfixer.configure({
               hostURL: 'https://seo-fixer.writesonic.com',
